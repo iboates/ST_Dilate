@@ -1,8 +1,7 @@
-﻿DROP FUNCTION st_percentbuffer(geometry,double precision,double precision,double precision);
-
-CREATE OR REPLACE FUNCTION ST_PercentBuffer(
+﻿CREATE OR REPLACE FUNCTION ST_PercentBuffer(
 	in_geom GEOMETRY,
 	scale_factor FLOAT,
+	buff FLOAT,
 	tol FLOAT DEFAULT 0.001,
 	step FLOAT DEFAULT 100
 )
@@ -21,37 +20,37 @@ DECLARE
 	
 BEGIN
 
-current_area = ST_Area(ST_Buffer(in_geom, step));
-dev = (current_area-desired_area)/current_area;
+current_area = ST_Area(ST_Buffer(in_geom, buff));
+dev = (current_area-desired_area)/desired_area;
 
 RAISE NOTICE 'current_area: %', current_area;
 RAISE NOTICE 'desired_area %', desired_area;
 RAISE NOTICE 'dev (created polygon is % percent bigger/smaller than the desired polygon', dev*100;
 
-WHILE ABS(dev) > tol AND safety_counter < 100 LOOP
+WHILE ABS(dev) > tol AND safety_counter < 1000 LOOP
 
 	IF dev < 0 THEN /* current area is smaller than desired area, increase the step */
-		step = step + step;
+		buff = buff + step;
 	ELSE /* current area is larger than desired area, decrease the step */
-		step = step - step;
+		buff = buff - step;
 	END IF;
-
-	old_dev = dev;
-
-	dev = (desired_area-current_area)/desired_area;
 
 	IF dev * old_dev < 0 THEN /* negative value indicates difference of sign, need to do a halving & directional reversal */
 		step = step*-0.5;
 	END IF;
 
-	current_area = ST_Area(ST_Buffer(in_geom, step));
+	current_area = ST_Area(ST_Buffer(in_geom, buff));
+	old_dev = dev;
+	dev = (current_area-desired_area)/desired_area;
 
 	safety_counter = safety_counter + 1;
-	RAISE NOTICE 'safety_counter: %', safety_counter;
-
-	RAISE NOTICE 'current_area: %', current_area;
-	RAISE NOTICE 'desired_area %', desired_area;
-	RAISE NOTICE 'dev (created polygon is % percent bigger/smaller than the desired polygon', dev*100;
+-- 	RAISE NOTICE 'safety_counter: %', safety_counter;
+-- 
+-- 	RAISE NOTICE 'current_area: %', current_area;
+-- 	RAISE NOTICE 'desired_area %', desired_area;
+-- 	RAISE NOTICE '    dev: %', dev;
+-- 	RAISE NOTICE 'old_dev: %', old_dev;
+-- 	RAISE NOTICE 'step: %', step;
 
 END LOOP;
 
@@ -61,9 +60,12 @@ END
 $$
 LANGUAGE plpgsql;
 
+DROP TABLE IF EXISTS buffresult;
+
+CREATE TABLE buffresult AS (
 SELECT
 	id AS id,
-	ST_Area(geom) AS geom,
-	ST_Area(ST_PercentBuffer(geom, 1.8)) AS pct_buff_geom
+	ST_Area(ST_PercentBuffer(geom, 1.1, 500)) AS geom
 FROM
-	public.shrinkpoly;
+	public.shrinkpoly
+);
