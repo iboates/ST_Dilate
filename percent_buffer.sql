@@ -1,0 +1,16 @@
+﻿CREATE OR REPLACE FUNCTION ST_PercentBuffer(
+	in_geom GEOMETRY,
+	buff_pct FLOAT,
+	step FLOAT
+)
+
+RETURNS GEOMETRY AS
+
+$$
+BEGIN
+
+
+
+END
+$$
+LANGUAGE plpgsql;
