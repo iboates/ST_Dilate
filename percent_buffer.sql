@@ -28,15 +28,13 @@ RAISE NOTICE 'current_area: %', current_area;
 RAISE NOTICE 'desired_area %', desired_area;
 RAISE NOTICE 'dev (created polygon is % percent bigger/smaller than the desired polygon', dev*100;
 
-WHILE ABS(dev) > tol OR safety_counter < 1 LOOP
+WHILE ABS(dev) > tol AND safety_counter < 100 LOOP
 
-	IF dev < 0 THEN /* deviation is negative, we are overestimating the area, decrease the step */
-		step = step - step;
-	ELSE /* deviation is positive, we are underestimating the area, increase the step */
+	IF dev < 0 THEN /* current area is smaller than desired area, increase the step */
 		step = step + step;
+	ELSE /* current area is larger than desired area, decrease the step */
+		step = step - step;
 	END IF;
-
-	current_area = ST_Area(ST_Buffer(in_geom, step));
 
 	old_dev = dev;
 
@@ -46,7 +44,14 @@ WHILE ABS(dev) > tol OR safety_counter < 1 LOOP
 		step = step*-0.5;
 	END IF;
 
+	current_area = ST_Area(ST_Buffer(in_geom, step));
+
 	safety_counter = safety_counter + 1;
+	RAISE NOTICE 'safety_counter: %', safety_counter;
+
+	RAISE NOTICE 'current_area: %', current_area;
+	RAISE NOTICE 'desired_area %', desired_area;
+	RAISE NOTICE 'dev (created polygon is % percent bigger/smaller than the desired polygon', dev*100;
 
 END LOOP;
 

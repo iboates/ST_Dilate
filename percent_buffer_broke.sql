@@ -27,24 +27,9 @@ dev = (current_area-desired_area)/current_area;
 RAISE NOTICE 'current_area: %', current_area;
 RAISE NOTICE 'desired_area %', desired_area;
 RAISE NOTICE 'dev (created polygon is % percent bigger/smaller than the desired polygon', dev*100;
-
-WHILE ABS(dev) > tol OR safety_counter < 1 LOOP
-
-	IF dev < 0 THEN /* deviation is negative, we are overestimating the area, decrease the step */
-		step = step - step;
-	ELSE /* deviation is positive, we are underestimating the area, increase the step */
-		step = step + step;
-	END IF;
-
-	current_area = ST_Area(ST_Buffer(in_geom, step));
-
-	old_dev = dev;
-
-	dev = (desired_area-current_area)/desired_area;
-
-	IF dev * old_dev < 0 THEN /* negative value indicates difference of sign, need to do a halving & directional reversal */
-		step = step*-0.5;
-	END IF;
+dev = 1;
+tol = 0;
+WHILE ABS(dev) > tol OR safety_counter < 10 LOOP
 
 	safety_counter = safety_counter + 1;
 
