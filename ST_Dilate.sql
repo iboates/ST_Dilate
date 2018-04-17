@@ -56,4 +56,4 @@ END
 $$
 LANGUAGE plpgsql IMMUTABLE COST 100;
 
-COMMENT ON ST_Dilate IS 'Created by Isaac Boates. Use of this software is at the user''s own risk, and no responsibility is claimed by the author in the event of damages, whether tangible or financial caused directly or indirectly by the use of this software.'
+COMMENT ON FUNCTION ST_Dilate(GEOMETRY, DOUBLE PRECISION, DOUBLE PRECISION, DOUBLE PRECISION, INTEGER) IS 'Created by Isaac Boates. Use of this software is at the user''s own risk, and no responsibility is claimed by the creator in the event of damages, whether tangible or financial caused directly or indirectly by the use of this software.';
