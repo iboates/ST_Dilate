@@ -57,11 +57,27 @@ $$
 LANGUAGE plpgsql;
 
 DROP TABLE IF EXISTS public.st_dilate_testresult;
-CREATE TABLE public.st_dilate_testresult AS (
-SELECT
-	id AS id,
-	ST_Dilate(geom, 10) AS geom,
-	ST_Area(ST_Dilate(geom, 10)) AS area
-FROM
-	public.shrinkpoly
+CREATE TABLE public.st_dilate_testresult (
+	test_name TEXT,
+	expected_area FLOAT,
+	actual_area FLOAT,
+	deviation FLOAT,
+	geom GEOMETRY
 );
+
+DO
+$$
+DECLARE polygon GEOMETRY = ST_GeomFromText('Polygon ((-0.83966746 0.695962, 0.30760095 0.695962, 0.30760095 -0.29928741, -0.83966746 -0.29928741, -0.83966746 0.695962))');
+DECLARE multipolygon GEOMETRY = ST_GeomFromText('MultiPolygon (((-0.83966746 0.695962, 0.30760095 0.695962, 0.30760095 -0.29928741, -0.83966746 -0.29928741, -0.83966746 0.695962)))');
+BEGIN
+INSERT INTO
+	public.st_dilate_testresult
+VALUES (
+	'Positive scale factor',
+	1.5*ST_Area(multipolygon),
+	ST_Area(ST_Dilate(multipolygon, 1.5)),
+	(1 - 2) / 1,
+	ST_Dilate(multipolygon, 1.5)
+);
+END
+$$;
