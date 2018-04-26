@@ -26,7 +26,7 @@ The parameters for the function are:
 * `scale_factor GEOMETRY` - Factor by which to dilate the polygon. Cannot be negative. If less than 1, a shrinking will occur. If greater than 1, an expansion will occur.
 * `tol FLOAT` - Tolerance value. Since the solution is iterative, an exact dilation is near-impossible. The geometry returned will be the first one found that whose normalized difference from the theoretical dilated area (`scale factor * ST_Area(in_geom)`) is less than this value. Default value is 0.001 (0.1%).
 * `guess FLOAT` - The first buffer distance that will be tested. Subsequent attempts will be plus or minus half of this amount until it is necessary to switch from expansion to growth or vice versa. It is a good idea to set this value to be approximately around the order of magnitude of the expected required distance. Default value is 1.
-* `safet INTEGER` - The number of attempted buffer operations before giving up and returning a NULL geometry. Since the solution is iterative, this acts as a failsafe to prevent infinte loops from occuring in the event of unexpected behaviour. Default value is 1000.
+* `safety INTEGER` - The number of attempted buffer operations before giving up and returning a NULL geometry. Since the solution is iterative, this acts as a failsafe to prevent infinte loops from occuring in the event of unexpected behaviour. Default value is 1000.
 
 ## How it works
 
