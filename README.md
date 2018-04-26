@@ -2,6 +2,8 @@
 
 PostGIS function for dilating (inflating and deflating) polygon geometries by a specified scale factor.
 
+[More Info](http://iboates.alpheca.uberspace.de/expanding-and-shrinking-polygons-with-st_dilate/)
+
 ![](http://iboates.alpheca.uberspace.de/wordpress/wp-content/uploads/2018/04/buffers.png)
 
 ## Installation
